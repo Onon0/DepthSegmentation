@@ -2,7 +2,8 @@ import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
-
+import cv2
+vid = cv2.VideoCapture(0)
 # Window dimensions
 window_width, window_height = 800, 600
 
@@ -25,7 +26,8 @@ def init_opengl():
 
 def draw_scene():
     global x_rot, y_rot, z_rot
-
+    ret, frame = vid.read()
+    frame = frame/255
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     gluPerspective(45, (window_width / window_height), 0.1, 50.0)
@@ -35,11 +37,12 @@ def draw_scene():
     glRotatef(z_rot, 0.0, 0.0, 1.0)
 
     # Draw a simple plane
-    glBegin(GL_QUADS)
-    glVertex3f(-1.0, -1.0,  0.0)
-    glVertex3f( 1.0, -1.0,  0.0)
-    glVertex3f( 1.0,  1.0,  0.0)
-    glVertex3f(-1.0,  1.0,  0.0)
+    glBegin(GL_POINTS)
+    for i in range(224):
+        for j in range(224):
+            glColor3f(frame[i][j][2], frame[i][j][1], frame[i][j][0])
+            glVertex3f(i*0.01 - 1, j*0.01 - 1,  frame[i][j][2])
+    
     glEnd()
 
     glutSwapBuffers()
